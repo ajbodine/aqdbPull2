@@ -1,0 +1,748 @@
+---
+title: "AQ Dashboard Report"
+date: '`r Sys.Date()`'
+output:
+  html_document:
+    theme: simplex
+    self_contained: yes
+params:
+  dom: NA
+  patFIN: NA
+  patMRN: NA
+  patName: NA
+  patMS: NA
+  patCMG: NA
+  patFloor: NA
+  patAdmit: NA
+  patAP: NA
+  sg: NA
+  mg: NA
+  cg: NA
+  checkGoalsSC: NA
+  checkGoalsMob: NA
+  checkGoalsCog: NA
+  nullScoSC: NA
+  nullScoMob: NA
+  nullScoCog: NA
+  fimPlot: NA
+  toPlot: NA
+  xAx2: NA
+  yAx2: NA
+  balwlk: NA
+  coggroup: NA
+  predPlotFull: NA
+  tlData: NA
+  groups: NA
+---
+
+```{r, echo = F, message = F, warning = F}
+div(style = 'position: relative;',
+    htmltools::img(src = knitr::image_uri(file.path('sralabLogo.png')), 
+                   alt = 'logo', 
+                   style = 'position:absolute; top:-90px; right:0; padding:10px; max-width: 25%; min-width: 45px;'
+    )
+)
+```
+
+```{r echo = F, message = F, warning = F, results = 'asis'}
+cat("
+<style>
+p {
+  font-size: 16px;
+}
+h5 {
+  font-size: 24px;
+}
+@media print {
+  html, body, .printable, .results-pane, .embed-view {
+    width: 8.5in !important;
+    height: 11in !important;
+  }
+  img {
+    position: absolute;
+    top: -90px;
+    right: 0;
+    padding: 10px;
+    max-width: 25%;
+    min-width: 45px;
+  }
+
+  @page {
+    size: 8.5in 11in;
+    margin-top: 0.25in;
+    margin-left: 0.5in;
+    margin-right: 0.5in;
+    margin-bottom: 0.25in;
+  }
+}
+img {
+  position: absolute;
+  top: -90px;
+  right: 0;
+  padding: 10px;
+  max-width: 25%;
+  min-width: 45px;
+}
+</style>
+")
+```
+
+
+---
+
+##### Description
+This is an automatically generated HTML report from the AQ Dashboard. Please note that this
+document contains PHI and should be treated as such.
+
+
+
+
+The AQ Domain reported below is **`r ifelse(params$dom == 'sc', 'Self Care', ifelse(params$dom == 'mob', 'Mobility', 'Cognition'))`**.
+
+
+---
+
+
+##### Patient Information:
+Name: **`r params$patName`**
+
+Admission Date: `r as.Date(as.numeric(params$patAdmit), format = '%Y-%d-%m', origin = '1970-01-01')` 
+(`r as.numeric(Sys.Date() - as.Date(as.numeric(params$patAdmit), format = '%Y-%d-%m', origin = '1970-01-01'))` days ago)
+  
+FIN and MRN: (`r params$patFIN` | `r params$patMRN`)
+
+Medical Service: `r params$patMS`
+
+Case Mix Group: `r params$patCMG`
+
+Floor: `r params$patFloor`
+
+Attending Physician: `r params$patAP`
+
+AQ - `r ifelse(params$dom == 'sc', 'Self Care', ifelse(params$dom == 'mob', 'Mobility', 'Cognition'))` Group: 
+`r ifelse(params$dom == 'sc', params$sg, ifelse(params$dom == 'mob', params$mg, params$cg))`
+
+
+
+---
+
+
+
+```{r, echo = F, message = F, warning = F, fig.align = 'center'}
+col <- c('#888b8d', '#861f41', '#ed1c2c', '#6d2077', '#ffd100', '#ffa168', '#fc8e13', '#f36b21')
+names(col) <- c('gray', 'maroon', 'red', 'purple', 'yellow', 'lt. orange', 'med. orange', 'orange')
+
+if(params$dom == 'sc'){
+  if(params$checkGoalsSC){
+    div(
+      plot_ly(params$fimPlot,
+        type = 'bar',
+        x = ~items,
+        y = ~actual,
+        text = ~paste('Current: ', atext),
+        hoverinfo = 'text',
+        name = 'Current',
+        marker = list(color = col[4])
+    ) %>%
+      add_trace(x = ~items,
+                y = ~predicted,
+                text = ~paste('Typical: ', ptext),
+                hoverinfo = 'text',
+                name = 'Typical for AQ Score',
+                marker = list(color = col[5])
+      ) %>%
+      add_trace(x = ~items,
+                y = ~goals,
+                text = ~paste('Goal: ', gtext),
+                hoverinfo = 'text',
+                name = 'Goal',
+                marker = list(color = col[8])
+      ) %>%
+      layout(xaxis = list(title = '',
+                          tickangle = -60,
+                          type = 'cateogry',
+                          tickfont = list(size = 18),
+                          titlefont = list(size = 20)),
+             yaxis = list(range = c(0, 7),
+                          title = 'Functional Categories',
+                          autotick = F,
+                          dtick = 1,
+                          tickfont = list(size = 18),
+                          titlefont = list(size = 20)),
+             barmode = 'group',
+             legend = list(orientation = 'h', xanchor = 'center', x = .5, y = 1.2, font = list(size = 16)),
+             margin = list(b = 175),
+             autosize = T,
+             hoverlabel = list(font = list(size = 16)),
+             plot_bgcolor = '#fcfcfc',
+             paper_bgcolor = '#fcfcfc'
+      )
+    )
+  }else{
+    div(
+      plot_ly(params$fimPlot,
+        type = 'bar',
+        x = ~items,
+        y = ~actual,
+        name = 'Current',
+        marker = list(color = col[4])
+    ) %>%
+      add_trace(~items,
+                y = ~predicted,
+                name = 'Typical for AQ Score',
+                marker = list(color = col[5])
+      ) %>%
+      add_trace(~items,
+                y = ~goals,
+                name = 'Goal',
+                marker = list(color = col[8])
+      ) %>%
+      layout(xaxis = list(title = '',
+                          tickangle = -60,
+                          type = 'category',
+                          tickfont = list(size = 18),
+                          titlefont = list(size = 20)),
+             yaxis = list(range = c(0, 7),
+                          title = 'Functional Categories',
+                          autotick = F,
+                          dtick = 1,
+                          tickfont = list(size = 18),
+                          titlefont = list(size = 20)),
+             barmode = 'group',
+             legend = list(orientation = 'h', xanchor = 'center', x = .5, y = 1.2, font = list(size = 16)),
+             margin = list(b = 175),
+             autosize = T,
+             hoverlabel = list(font = list(size = 16)),
+             plot_bgcolor = '#fcfcfc',
+             paper_bgcolor = '#fcfcfc'
+      )
+    )
+  }
+}else if(params$dom == 'mob'){
+  if(params$checkGoalsMob){
+    div(
+      plot_ly(params$fimPlot,
+        type = 'bar',
+        x = ~items,
+        y = ~actual,
+        text = ~paste('Current: ', atext),
+        hoverinfo = 'text',
+        name = 'Current',
+        marker = list(color = col[4])
+    ) %>%
+      add_trace(x = ~items,
+                y = ~predicted,
+                text = ~paste('Typical: ', ptext),
+                hoverinfo = 'text',
+                name = 'Typical for AQ Score',
+                marker = list(color = col[5])
+      ) %>%
+      add_trace(x = ~items,
+                y = ~goals,
+                text = ~paste('Goal: ', gtext),
+                hoverinfo = 'text',
+                name = 'Goal',
+                marker = list(color = col[8])
+      ) %>%
+      layout(xaxis = list(title = '',
+                          tickangle = -60,
+                          type = 'cateogry',
+                          tickfont = list(size = 18),
+                          titlefont = list(size = 20)),
+             yaxis = list(range = c(0, 7),
+                          title = 'Functional Categories',
+                          autotick = F,
+                          dtick = 1,
+                          tickfont = list(size = 18),
+                          titlefont = list(size = 20)),
+             barmode = 'group',
+             legend = list(orientation = 'h', xanchor = 'center', x = .5, y = 1.2, font = list(size = 16)),
+             margin = list(b = 175),
+             autosize = T,
+             hoverlabel = list(font = list(size = 16)),
+             plot_bgcolor = '#fcfcfc',
+             paper_bgcolor = '#fcfcfc'
+      )
+    )
+  }else{
+    div(
+      plot_ly(params$fimPlot,
+        type = 'bar',
+        x = ~items,
+        y = ~actual,
+        name = 'Current',
+        marker = list(color = col[4])
+    ) %>%
+      add_trace(~items,
+                y = ~predicted,
+                name = 'Typical for AQ Score',
+                marker = list(color = col[5])
+      ) %>%
+      add_trace(~items,
+                y = ~goals,
+                name = 'Goal',
+                marker = list(color = col[8])
+      ) %>%
+      layout(xaxis = list(title = '',
+                          tickangle = -60,
+                          type = 'category',
+                          tickfont = list(size = 18),
+                          titlefont = list(size = 20)),
+             yaxis = list(range = c(0, 7),
+                          title = 'Functional Categories',
+                          autotick = F,
+                          dtick = 1,
+                          tickfont = list(size = 18),
+                          titlefont = list(size = 20)),
+             barmode = 'group',
+             legend = list(orientation = 'h', xanchor = 'center', x = .5, y = 1.2, font = list(size = 16)),
+             margin = list(b = 175),
+             autosize = T,
+             hoverlabel = list(font = list(size = 16)),
+             plot_bgcolor = '#fcfcfc',
+             paper_bgcolor = '#fcfcfc'
+      )
+    )
+  }
+}else if(params$dom == 'cog'){
+    if(params$checkGoalsCog && !is.na(params$cg)){
+      div(
+        plot_ly(params$fimPlot,
+          type = 'bar',
+          x = ~items,
+          y = ~actual,
+          text = ~paste('Current: ', atext),
+          hoverinfo = 'text',
+          name = 'Current',
+          marker = list(color = col[4])
+      ) %>%
+        add_trace(x = ~items,
+                  y = ~predicted,
+                  text = ~paste('Typical: ', ptext),
+                  hoverinfo = 'text',
+                  name = 'Typical for AQ Score',
+                  marker = list(color = col[5])
+        ) %>%
+        add_trace(x = ~items,
+                  y = ~goals,
+                  text = ~paste('Goal: ', gtext),
+                  hoverinfo = 'text',
+                  name = 'Goal',
+                  marker = list(color = col[8])
+        ) %>%
+        layout(xaxis = list(title = '',
+                            tickangle = -60,
+                            type = 'cateogry',
+                            tickfont = list(size = 18),
+                            titlefont = list(size = 20)),
+               yaxis = list(range = c(0, 7),
+                            title = 'Functional Categories',
+                            autotick = F,
+                            dtick = 1,
+                            tickfont = list(size = 18),
+                            titlefont = list(size = 20)),
+               barmode = 'group',
+               legend = list(orientation = 'h', xanchor = 'center', x = .5, y = 1.2, font = list(size = 16)),
+               margin = list(b = 175),
+               autosize = T,
+               hoverlabel = list(font = list(size = 16)),
+               plot_bgcolor = '#fcfcfc',
+               paper_bgcolor = '#fcfcfc'
+        )
+    )
+  }else{
+    div(
+      plot_ly(params$fimPlot,
+        type = 'bar',
+        x = ~items,
+        y = ~actual,
+        name = 'Current',
+        marker = list(color = col[4])
+    ) %>%
+      add_trace(~items,
+                y = ~predicted,
+                name = 'Typical for AQ Score',
+                marker = list(color = col[5])
+      ) %>%
+      add_trace(~items,
+                y = ~goals,
+                name = 'Goal',
+                marker = list(color = col[8])
+      ) %>%
+      layout(xaxis = list(title = '',
+                          tickangle = -60,
+                          type = 'category',
+                          tickfont = list(size = 18),
+                          titlefont = list(size = 20)),
+             yaxis = list(range = c(0, 7),
+                          title = 'Functional Categories',
+                          autotick = F,
+                          dtick = 1,
+                          tickfont = list(size = 18),
+                          titlefont = list(size = 20)),
+             barmode = 'group',
+             legend = list(orientation = 'h', xanchor = 'center', x = .5, y = 1.2, font = list(size = 16)),
+             margin = list(b = 175),
+             autosize = T,
+             hoverlabel = list(font = list(size = 16)),
+             plot_bgcolor = '#fcfcfc',
+             paper_bgcolor = '#fcfcfc'
+      )
+    )
+  }
+}
+```
+
+
+---
+
+
+
+```{r, echo = F, message = F, warning = F, fig.align = 'center'}
+col <- c('#888b8d', '#861f41', '#ed1c2c', '#6d2077', '#ffd100', '#ffa168', '#fc8e13', '#f36b21')
+names(col) <- c('gray', 'maroon', 'red', 'purple', 'yellow', 'lt. orange', 'med. orange', 'orange')
+
+if(params$dom == 'sc'){
+  pal <- col[c('orange', 'red', 'yellow', 'purple', 'gray')]
+  
+  div(
+    plot_ly(data = params$toPlot,
+            mode = 'lines+markers',
+            type = 'scatter',
+            x = ~assessmentDate,
+            y = ~sc,
+            connectgaps = T,
+            line = list(color = pal[1], width = 3, dash = 'solid'),
+            text = ~paste('Day ', assessmentDate, ': ', round(sc, 2), sep = ''),
+            name = 'AQ - Self Care',
+            hoverinfo = 'text',
+            marker = list(symbol = 'circle', size = 8, opacity = 1, color = pal[1]),
+            showlegend = T
+    ) %>%
+    add_trace(data = params$toPlot,
+              x = ~assessmentDate,
+              y = ~bal,
+              mode = 'lines+markers',
+              connectgaps = T,
+              line = list(color = pal[2], width = 2, dash = 'solid'),
+              text = ~paste(assessmentDate, ': ', round(bal, 2), sep = ''),
+              name = 'AQ - Balance',
+              hoverinfo = 'text',
+              marker = list(symbol = 'circle', size = 8, opacity = 1, color = pal[2]),
+              showlegend = T
+    ) %>%
+    add_trace(data = params$toPlot,
+              x = ~assessmentDate,
+              y = ~uef,
+              connectgaps = T,
+              mode = 'lines+markers',
+              line = list(color = pal[3], width = 2, dash = 'solid'),
+              text = ~paste(assessmentDate, ': ', round(uef, 2), sep = ''),
+              name = 'AQ - UE Function',
+              hoverinfo = 'text',
+              marker = list(symbol = 'circle', size = 8, opacity = 1, color = pal[3]),
+              showlegend = T
+    ) %>%
+    add_trace(data = params$toPlot,
+              x = ~assessmentDate,
+              y = ~swl,
+              connectgaps = T,
+              mode = 'lines+markers',
+              line = list(color = pal[4], width = 2, dash = 'solid'),
+              text = ~paste(assessmentDate, ': ', round(swl, 2), sep = ''),
+              name = 'AQ - Swallowing',
+              hoverinfo = 'text',
+              marker = list(symbol = 'circle', size = 8, opacity = 1, color = pal[4]),
+              showlegend = T
+    ) %>%
+    add_trace(data = params$predPlotFull,
+              x = ~assessmentDate,
+              y = ~Prediction,
+              mode = 'lines+markers',
+              connectgaps = T,
+              line = list(color = pal[5], dash = 'dash'),
+              text = ~paste(assessmentDate, ': ', round(Prediction, 2), sep = ''),
+              marker = list(symbol = 'line-ns', color = pal[5]),
+              hoverinfo = 'text',
+              name = 'AQ - SC Prediction',
+              showlegend = T
+    ) %>%
+    add_trace(data = params$predPlotFull,
+              x = ~assessmentDate,
+              y = ~fgLine,
+              name = 'Goal to AQ',
+              mode = 'lines',
+              line = list(color = pal[1], dash = 'dash'),
+              text = ~paste('Goal to AQ: ', round(fgLine, 2)),
+              marker = list(symbol = 'line-ns', color = pal[1]),
+              hoverinfo = 'text',
+              showlegend = T
+    ) %>%
+    layout(
+      xaxis = params$xAx2,
+      yaxis = params$yAx2,
+      legend = list(orientation = 'h', xanchor = 'center', x = .5, y = 1.2, font = list(size = 16)),
+      hoverlabel = list(font = list(size = 16)),
+      margin = list(b = 100),
+      plot_bgcolor = '#fcfcfc',
+      paper_bgcolor = '#fcfcfc'
+    )
+  )
+}else if(params$dom == 'mob'){
+  pal <- col[c('orange', 'red', 'yellow', 'purple', 'maroon', 'gray')]
+  
+  div(
+    plot_ly(data = params$toPlot,
+            mode = 'lines+markers',
+            type = 'scatter',
+            x = ~assessmentDate,
+            y = ~mob,
+            connectgaps = T,
+            line = list(color = pal[1], width = 3, dash = 'solid'),
+            text = ~paste('Day ', assessmentDate, ': ', round(mob, 2), sep = ''),
+            name = 'AQ - Mobility',
+            hoverinfo = 'text',
+            marker = list(symbol = 'circle', size = 8, opacity = 1, color = pal[1]),
+            showlegend = T
+    ) %>%
+    add_trace(data = params$toPlot,
+              x = ~assessmentDate,
+              y = ~bal,
+              mode = 'lines+markers',
+              connectgaps = T,
+              line = list(color = pal[2], width = 2, dash = 'solid'),
+              text = ~paste(assessmentDate, ': ', round(bal, 2), sep = ''),
+              name = params$balwlk,
+              hoverinfo = 'text',
+              marker = list(symbol = 'circle', size = 8, opacity = 1, color = pal[2]),
+              showlegend = T
+    ) %>%
+    add_trace(data = params$toPlot,
+              x = ~assessmentDate,
+              y = ~wc,
+              connectgaps = T,
+              mode = 'lines+markers',
+              line = list(color = pal[3], width = 2, dash = 'solid'),
+              text = ~paste(assessmentDate, ': ', round(wc, 2), sep = ''),
+              name = 'AQ - Wheel Chair',
+              hoverinfo = 'text',
+              marker = list(symbol = 'circle', size = 8, opacity = 1, color = pal[3]),
+              showlegend = T
+    ) %>%
+    add_trace(data = params$toPlot,
+              x = ~assessmentDate,
+              y = ~xfer,
+              connectgaps = T,
+              mode = 'lines+markers',
+              line = list(color = pal[4], width = 2, dash = 'solid'),
+              text = ~paste(assessmentDate, ': ', round(xfer, 2), sep = ''),
+              name = 'AQ - Bathroom Transfers',
+              hoverinfo = 'text',
+              marker = list(symbol = 'circle', size = 8, opacity = 1, color = pal[4]),
+              showlegend = T
+    ) %>%
+    add_trace(data = params$toPlot,
+              x = ~assessmentDate,
+              y = ~cbp,
+              connectgaps = T,
+              mode = 'lines+markers',
+              line = list(color = pal[5], width = 2, dash = 'solid'),
+              text = ~paste(assessmentDate, ': ', round(cbp, 2), sep = ''),
+              name = 'AQ - Changing Body Position',
+              hoverinfo = 'text',
+              marker = list(symbol = 'circle', size = 8, opacity = 1, color = pal[5]),
+              showlegend = T
+    ) %>%
+    add_trace(data = params$predPlotFull,
+              x = ~assessmentDate,
+              y = ~Prediction,
+              mode = 'lines+markers',
+              connectgaps = T,
+              line = list(color = pal[6], dash = 'dash'),
+              text = ~paste(assessmentDate, ': ', round(Prediction, 2), sep = ''),
+              marker = list(symbol = 'line-ns', color = pal[6]),
+              hoverinfo = 'text',
+              name = 'AQ - Mob Prediction',
+              showlegend = T
+    ) %>%
+    add_trace(data = params$predPlotFull,
+              y = ~fgLine,
+              x = ~assessmentDate,
+              name = 'Goal to AQ',
+              mode = 'lines',
+              line = list(color = pal[1], dash = 'dash'),
+              text = ~paste('Goal to AQ: ', round(fgLine, 2)),
+              marker = list(symbol = 'line-ns', color = pal[1]),
+              hoverinfo = 'text',
+              showlegend = T
+    ) %>%
+    layout(
+      xaxis = params$xAx2,
+      yaxis = params$yAx2,
+      legend = list(orientation = 'h', xanchor = 'center', x = .5, y = 1.2, font = list(size = 16)),
+      hoverlabel = list(font = list(size = 16)),
+      margin = list(b = 100),
+      plot_bgcolor = '#fcfcfc',
+      paper_bgcolor = '#fcfcfc'
+    )
+  )
+}else if(params$dom == 'cog'){
+  pal <- col[c('orange', 'red', 'yellow', 'purple', 'gray')]
+  
+  if(params$coggroup){
+    div(
+      plot_ly(data = params$toPlot,
+              type = 'scatter',
+              mode = 'lines+markers',
+              x = ~assessmentDate,
+              y = ~cog,
+              connectgaps = T,
+              line = list(color = pal[1], dash = 'solid'),
+              text = ~paste(assessmentDate, ': ', round(cog, 2), sep = ''),
+              name = 'AQ - Cognition',
+              hoverinfo = 'text',
+              marker = list(size = 8, color = pal[1])
+      ) %>%
+        add_trace(data = params$toPlot,
+                  x = ~assessmentDate,
+                  y = ~com,
+                  mode = 'lines+markers',
+                  connectgaps = T,
+                  line = list(color = pal[2], width = 2, dash = 'solid'),
+                  text = ~paste(assessmentDate, ': ', round(com, 2), sep = ''),
+                  name = 'AQ - Communication',
+                  hoverinfo = 'text',
+                  marker = list(size = 8, color = pal[2])
+        ) %>%
+        add_trace(data = params$toPlot,
+                  x = ~assessmentDate,
+                  y = ~spe,
+                  mode = 'lines+markers',
+                  connectgaps = T,
+                  line = list(color = pal[2], width = 2, dash = 'solid'),
+                  text = ~paste(assessmentDate, ': ', round(spe, 2), sep = ''),
+                  name = 'AQ - Speech',
+                  hoverinfo = 'text',
+                  marker = list(size = 8, color = pal[2])
+        ) %>%
+        add_trace(data = params$toPlot,
+                  x = ~assessmentDate,
+                  y = ~wcom,
+                  mode = 'lines+markers',
+                  connectgaps = T,
+                  line = list(color = pal[3], width = 2, dash = 'solid'),
+                  text = ~paste(assessmentDate, ': ', round(wcom, 2), sep = ''),
+                  name = 'AQ - Writing',
+                  hoverinfo = 'text',
+                  marker = list(size = 8, color = pal[3])
+        ) %>%
+        add_trace(data = params$toPlot,
+                  x = ~assessmentDate,
+                  y = ~mem,
+                  mode = 'lines+markers',
+                  connectgaps = T,
+                  line = list(color = pal[3], width = 2, dash = 'solid'),
+                  text = ~paste(assessmentDate, ': ', round(mem, 2), sep = ''),
+                  name = 'AQ - Memory',
+                  hoverinfo = 'text',
+                  marker = list(size = 8, color = pal[3])
+        ) %>%
+        add_trace(data = params$toPlot,
+                  x = ~assessmentDate,
+                  y = ~comp,
+                  mode = 'lines+markers',
+                  connectgaps = T,
+                  line = list(color = pal[4], width = 2, dash = 'solid'),
+                  text = ~paste(assessmentDate, ': ', round(comp, 2), sep = ''),
+                  name = 'AQ - Comprehension',
+                  hoverinfo = 'text',
+                  marker = list(size = 8, color = pal[4])
+        ) %>%
+        add_trace(data = params$toPlot,
+                  x = ~assessmentDate,
+                  y = ~agi,
+                  mode = 'lines+markers',
+                  connectgaps = T,
+                  line = list(color = pal[4], width = 2, dash = 'solid'),
+                  text = ~paste(assessmentDate, ': ', round(agi, 2), sep = ''),
+                  name = 'AQ - Agitation',
+                  hoverinfo = 'text',
+                  marker = list(size = 8, color = pal[4])
+        ) %>%
+        add_trace(data = params$predPlotFull,
+                  x = ~assessmentDate,
+                  y = ~Prediction,
+                  type = 'scatter',
+                  mode = 'lines+markers',
+                  connectgaps = T,
+                  line = list(color = pal[5], dash = 'dash'),
+                  text = ~paste(assessmentDate, ': ', round(Prediction, 2), sep = ''),
+                  marker = list(symbol = 'line-ns', color = pal[5]),
+                  hoverinfo = 'text',
+                  name = 'AQ - Cog Prediction'
+        ) %>%
+        add_trace(data = params$predPlotFull,
+                  y = ~fgLine,
+                  x = ~assessmentDate,
+                  name = 'Goal to AQ',
+                  line = list(color = pal[1], dash = 'dash'),
+                  text = ~paste('Goal to AQ: ', round(fgLine, 2)),
+                  marker = list(symbol = 'line-ns', color = pal[1]),
+                  hoverinfo = 'text'
+        ) %>%
+        layout(
+          xaxis = params$xAx2,
+          yaxis = params$yAx2,
+          legend = list(orientation = 'h', xanchor = 'center', x = .5, y = 1.2, font = list(size = 16)),
+          hoverlabel = list(font = list(size = 16)),
+          margin = list(b = 100),
+          plot_bgcolor = '#fcfcfc',
+          paper_bgcolor = '#fcfcfc'
+        )
+    )
+  }else{
+    nullX <- list(range = c(0, 50),
+                  title = 'Date',
+                  zeroline = F
+    )
+    nullY <- list(title = 'AQ - Cog Scores',
+                  range = c(-4, 4),
+                  zeroline = F
+    )
+    
+    nullDat <- data.frame(x = 25,
+                          y = 0
+    )
+
+    div(
+      plot_ly(data = nullDat,
+              x = ~x,
+              y = ~y,
+              type = 'scatter',
+              mode = 'text',
+              text = 'No SLP Eval',
+              textfont = list(color = '#000000', size = 16)
+      ) %>%
+        layout(
+          xaxis = nullX,
+          yaxis = nullY,
+          hoverlabel = list(font = list(size = 16)),
+          plot_bgcolor = '#fcfcfc',
+          paper_bgcolor = '#fcfcfc'
+        )
+    )
+  }
+}
+```
+
+
+---
+
+
+
+```{r, echo = F, message = F, warning = F, fig.align = 'center'}
+div(
+  timevis(data = params$tlData, group = params$groups, fit = T, options = list(stack = F, autoResize = T), width = '910px')
+)
+```
+

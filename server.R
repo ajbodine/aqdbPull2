@@ -19959,6 +19959,7 @@ server <- function(input, output, session){
     )))))))))))
     ## Record the patient's CMG
     rv$cmg <- isolate(as.character(rv$row[5]))
+    rv$cmg <- ifelse(isolate(rv$cmg) == '0203', '0204', isolate(rv$cmg))
     ## Record the floor of the hospital the patient is staying on
     rv$floor <- isolate(as.character(rv$row[6]))
     ## Record the patient's current LoS

@@ -16362,6 +16362,7 @@ server <- function(input, output, session){
                       FROM outcomedm.current_ninehole_frmt'
     )
   }
+  nhp <- nhp[, 1:5]
   colnames(nhp) <- c('MRN', 'FIN', 'scoreLeftNHP', 'scoreRightNHP',
                      'assessmentDate'
   )
@@ -16493,6 +16494,7 @@ server <- function(input, output, session){
                               FROM outcomedm.current_pinchgrip_frmt'
     )
   }
+  pg <- pg[, 1:7]
   colnames(pg) <- c('MRN', 'FIN', 'keyPR', 'keyPL', 'gripR', 'gripL',
                     'assessmentDate'
   )

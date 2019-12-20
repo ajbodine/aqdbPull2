@@ -16112,9 +16112,9 @@ server <- function(input, output, session){
   ## Drops patients who are duplicated because of multiple CMGs. This is
   ## another part that will have to be edited for rollout on different floors.
   ## This conditional removes patients with non-stroke CMGs.
-  if(any(duplicated(hp[, c(1:3, 6:7)]))){
-    hp <- hp[grep('01..', hp$cmg_cd), ]
-  }
+  # if(any(duplicated(hp[, c(1:3, 6:7)]))){
+  #   hp <- hp[grep('01..', hp$cmg_cd), ]
+  # }
   colnames(hp) <- c('FIN', 'MRN', 'Name', 'MedicalService', 'CMG', 'Floor',
                     'Admit', 'ExpDepart', 'Age'
   )

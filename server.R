@@ -10160,7 +10160,7 @@ server <- function(input, output, session){
       ## If the LoS group is missing somehow, just use the initial one from the
       ## data pulled from the EDW
       if(is.null(isolate(gv$losgroup))){
-        gv$losgroup <- isolate(input$losGroup)
+        gv$losgroup <- isolate(rv$losgroup)
       }
       
       ## Ditto for the SC group
@@ -19951,7 +19951,7 @@ server <- function(input, output, session){
     )))))))))))
     ## Record the patient's CMG
     rv$cmg <- isolate(as.character(rv$row[5]))
-    rv$cmg <- ifelse(isolate(rv$cmg) == '0203', '0204', isolate(rv$cmg))
+    rv$cmg <- ifelse(isolate(rv$cmg) %in% c('0203', '0202', '0201'), '0204', isolate(rv$cmg))
     ## Record the floor of the hospital the patient is staying on
     rv$floor <- isolate(as.character(rv$row[6]))
     ## Record the patient's current LoS

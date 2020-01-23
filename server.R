@@ -14237,13 +14237,11 @@ server <- function(input, output, session){
     if(dom == 'sc'){
       linePlotSC()
       goalPlotSC()
-      improvementTL()
       sidebarSC()
     ## Otherwise, if it's mobility, run those functions.
     }else if(dom == 'mob'){
       linePlotMob()
       goalPlotMob()
-      improvementTL()
       sidebarMob()
     ## Or, if the user selected cognition, run those functions. 
     }else if(dom == 'cog'){
@@ -14263,7 +14261,6 @@ server <- function(input, output, session){
         linePlotCog()
       }
       goalPlotCog()
-      improvementTL()
       sidebarCog()
     }
     ## Regardless of the chosen domain, load the sliders for the "FIM Update"
@@ -14747,7 +14744,6 @@ server <- function(input, output, session){
   ## (to reset the TRC), then also rerenders the timeline and sidebar.
   resetHandler <- function(){
     resetITC()
-    improvementTL()
     if(isolate(uv$dom == 'sc')){
       sidebarSC()
     }else if(isolate(uv$dom == 'mob')){

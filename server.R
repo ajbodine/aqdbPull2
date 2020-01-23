@@ -14385,14 +14385,12 @@ server <- function(input, output, session){
       )
       goalPlotSC()
       sidebarSC()
-      renderTL()
     }else if(isolate(uv$dom) == 'mob'){
       initTC_mob(toPlot = rv$toPlot, predPlot = rv$predPlot,
                  fgLine = rv$fgLine, goalGroup = input$canWalk,
                  losGroup = input$losGroup, xAx = rv$xAx, yAx = rv$yAx,
                  pal = rv$pal
       )
-      renderTL()
       goalPlotMob_update()
       sidebarMob()
       sidebarMob()
@@ -14404,7 +14402,6 @@ server <- function(input, output, session){
       )
       goalPlotCog()
       sidebarCog()
-      renderTL()
     }
   }
   
@@ -14434,14 +14431,12 @@ server <- function(input, output, session){
                 goalGroup = input$balLevel, losGroup = gv$losgroup,
                 xAx = rv$xAx, yAx = rv$yAx, pal = rv$pal
       )
-      renderTL()
     }else if(isolate(uv$dom) == 'mob'){
       initTC_mob(toPlot = rv$toPlot, predPlot = rv$predPlot,
                  fgLine = rv$fgLine, goalGroup = input$canWalk,
                  losGroup = gv$losgroup, xAx = rv$xAx, yAx = rv$yAx,
                  pal = rv$pal
       )
-      renderTL()
     }else{
       if(tv$nullCogTL == 0){
         initTC_cog(toPlot = rv$toPlot, predPlot = rv$predPlot,
@@ -14449,7 +14444,6 @@ server <- function(input, output, session){
                    losGroup = gv$losgroup, xAx = rv$xAx, yAx = rv$yAx,
                    pal = rv$pal
         )
-        renderTL()
       }
     }
   }

@@ -10160,7 +10160,7 @@ server <- function(input, output, session){
       ## If the LoS group is missing somehow, just use the initial one from the
       ## data pulled from the EDW
       if(is.null(isolate(gv$losgroup))){
-        gv$losgroup <- isolate(rv$losgroup)
+        gv$losgroup <- isolate(input$losGroup)
       }
       
       ## Ditto for the SC group
